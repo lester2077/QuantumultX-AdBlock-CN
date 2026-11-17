@@ -28,7 +28,7 @@ for name in inputs:
   if not line or line.startswith(('#',';')):continue
   key=','.join(x.strip() for x in line.split(','))
   if key not in seen:seen.add(key);rules.append(line)
-(out/'AdBlock-Merged.list').write_text('# NAME: AdBlock-Merged\n# Sources: '+', '.join(inputs)+f'\n# TOTAL: {len(rules)}\n\n'+'\n'.join(rules)+'\n',encoding='utf-8')
+(out/'AdBlock-Merged.list').write_text('# NAME: AdBlock-Merged-Filter\n# Sources: '+', '.join(inputs)+f'\n# TOTAL: {len(rules)}\n\n'+'\n'.join(rules)+'\n',encoding='utf-8')
 rewrites=[];hosts=[];seen=set()
 for name in ['AdBlock-Splash.conf','AdBlock-Script-a.conf']:
  for line in (root/'rewrite'/name).read_text(encoding='utf-8-sig').splitlines():
@@ -42,7 +42,7 @@ removed=[line for line in rewrites if ' url reject' in line and line.split(' url
 rewrites=[line for line in rewrites if line not in removed]
 # Keep response script declarations before remaining static rewrites.
 rewrites.sort(key=lambda line:0 if ' url script-' in line else 1)
-(out/'AdBlock-Merged.conf').write_text('# NAME: AdBlock-Merged\n# Sources: AdBlock-Splash.conf, AdBlock-Script-a.conf\n'+f'# TOTAL: {len(rewrites)}\n\n'+'\n'.join(rewrites)+'\nhostname = '+','.join(dict.fromkeys(hosts))+'\n',encoding='utf-8')
+(out/'AdBlock-Merged.conf').write_text('# NAME: AdBlock-Merged-Rewrite\n# Sources: AdBlock-Splash.conf, AdBlock-Script-a.conf\n'+f'# TOTAL: {len(rewrites)}\n\n'+'\n'.join(rewrites)+'\nhostname = '+','.join(dict.fromkeys(hosts))+'\n',encoding='utf-8')
 (out/'README.md').write_text('''# 合并规则
 
 - AdBlock-Merged.list：合并 Splash-Killer.list、BlockHttpDNS.list、AdBlock-Lite.list，按完整规则去重，保留原顺序和策略。
