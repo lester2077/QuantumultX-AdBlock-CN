@@ -28,7 +28,7 @@ for name in inputs:
   if not line or line.startswith(('#',';')):continue
   key=','.join(x.strip() for x in line.split(','))
   if key not in seen:seen.add(key);rules.append(line)
-(out/'AdBlock-Merged.list').write_text('# NAME: AdBlock-Merged-Filter\n# Sources: '+', '.join(inputs)+f'\n# TOTAL: {len(rules)}\n\n'+'\n'.join(rules)+'\n',encoding='utf-8')
+(out/'AdBlock-Merged-Filter.list').write_text('# NAME: AdBlock-Merged-Filter\n# Sources: '+', '.join(inputs)+f'\n# TOTAL: {len(rules)}\n\n'+'\n'.join(rules)+'\n',encoding='utf-8')
 rewrites=[];hosts=[];seen=set()
 for name in ['AdBlock-Splash.conf','AdBlock-Script-a.conf']:
  for line in (root/'rewrite'/name).read_text(encoding='utf-8-sig').splitlines():
@@ -42,11 +42,11 @@ removed=[line for line in rewrites if ' url reject' in line and line.split(' url
 rewrites=[line for line in rewrites if line not in removed]
 # Keep response script declarations before remaining static rewrites.
 rewrites.sort(key=lambda line:0 if ' url script-' in line else 1)
-(out/'AdBlock-Merged.conf').write_text('# NAME: AdBlock-Merged-Rewrite\n# Sources: AdBlock-Splash.conf, AdBlock-Script-a.conf\n'+f'# TOTAL: {len(rewrites)}\n\n'+'\n'.join(rewrites)+'\nhostname = '+','.join(dict.fromkeys(hosts))+'\n',encoding='utf-8')
+(out/'AdBlock-Merged-Rewrite.conf').write_text('# NAME: AdBlock-Merged-Rewrite\n# Sources: AdBlock-Splash.conf, AdBlock-Script-a.conf\n'+f'# TOTAL: {len(rewrites)}\n\n'+'\n'.join(rewrites)+'\nhostname = '+','.join(dict.fromkeys(hosts))+'\n',encoding='utf-8')
 (out/'README.md').write_text('''# 合并规则
 
-- AdBlock-Merged.list：合并 Splash-Killer.list、BlockHttpDNS.list、AdBlock-Lite.list，按完整规则去重，保留原顺序和策略。
-- AdBlock-Merged.conf：合并 AdBlock-Splash.conf、AdBlock-Script-a.conf，合并 hostname；完全相同 URL 正则的拒绝规则让位于脚本，脚本声明放在前面。
+- AdBlock-Merged-Filter.list：合并 Splash-Killer.list、BlockHttpDNS.list、AdBlock-Lite.list，按完整规则去重，保留原顺序和策略。
+- AdBlock-Merged-Rewrite.conf：合并 AdBlock-Splash.conf、AdBlock-Script-a.conf，合并 hostname；完全相同 URL 正则的拒绝规则让位于脚本，脚本声明放在前面。
 
 list 用于分流规则，conf 用于 MITM 模块。不要同时启用其原始来源，避免重复规则。
 
@@ -57,3 +57,7 @@ assert len(rewrites)==len(set(rewrites))
 assert all(not (' url reject' in x and x.split(' url ',1)[0] in script_patterns) for x in rewrites)
 print(f'Routing: {len(rules)}; rewrite: {len(rewrites)}; exact reject conflicts removed: {len(removed)}; hosts: {len(set(hosts))}')
 for line in removed:print('Removed: '+line)
+
+# Remove superseded outputs after generating both replacements.
+for old_name in ('AdBlock-Merged.list', 'AdBlock-Merged.conf'):
+    (out / old_name).unlink(missing_ok=True)
