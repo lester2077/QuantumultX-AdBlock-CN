@@ -1,0 +1,38 @@
+name: 每日同步原仓库规则
+on:
+  schedule:
+    - cron: '23 21 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 同步原仓库规则与脚本
+        run: |
+          set -euo pipefail
+          git fetch https://github.com/hwind2021/QuantumultX-AdBlock-CN.git main
+          git restore --source=FETCH_HEAD -- quantumultx/filter quantumultx/script quantumultx/mitm quantumultx/rewrite/AdBlock-All.conf quantumultx/rewrite/AdBlock-Feed.conf quantumultx/rewrite/AdBlock-Script.conf quantumultx/rewrite/AdBlock-Splash.conf
+      - name: 重建自定义配置和合并文件
+        run: python tools/update_custom_rules.py
+      - name: 提交更新
+        run: |
+          set -euo pipefail
+          git add quantumultx/filter quantumultx/script quantumultx/mitm quantumultx/rewrite quantumultx/merged
+          git diff --cached --check
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore: sync upstream rules and regenerate custom rules'
+          git push origin HEAD:main

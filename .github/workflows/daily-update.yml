@@ -30,6 +30,7 @@ concurrency:
 
 jobs:
   update:
+    if: github.repository == 'hwind2021/QuantumultX-AdBlock-CN'
     name: 拉取上游并重建规则
     runs-on: ubuntu-latest
     timeout-minutes: 30
