@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime, timedelta, timezone
 import os
 import re
 
@@ -20,6 +21,7 @@ text = re.sub(r'^# TOTAL:.*$', f'# TOTAL: {count}', text, flags=re.M)
 (root / 'quantumultx/rewrite/AdBlock-Script-a.conf').write_text(text, encoding='utf-8')
 from pathlib import Path
 root=Path('quantumultx'); out=root/'merged';out.mkdir(exist_ok=True)
+updated_at = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M:%S (UTC+8)')
 inputs=['Splash-Killer.list','BlockHttpDNS.list','AdBlock-Lite.list']
 seen=set(); rules=[]
 for name in inputs:
@@ -28,7 +30,7 @@ for name in inputs:
   if not line or line.startswith(('#',';')):continue
   key=','.join(x.strip() for x in line.split(','))
   if key not in seen:seen.add(key);rules.append(line)
-(out/'AdBlock-Merged-Filter.list').write_text('# NAME: AdBlock-Merged-Filter\n# Sources: '+', '.join(inputs)+f'\n# TOTAL: {len(rules)}\n\n'+'\n'.join(rules)+'\n',encoding='utf-8')
+(out/'AdBlock-Merged-Filter.list').write_text(f'# NAME: AdBlock-Merged-Filter\n# UPDATED: {updated_at}\n# Sources: '+', '.join(inputs)+f'\n# TOTAL: {len(rules)}\n\n'+'\n'.join(rules)+'\n',encoding='utf-8')
 rewrites=[];hosts=[];seen=set()
 for name in ['AdBlock-Splash.conf','AdBlock-Script-a.conf']:
  for line in (root/'rewrite'/name).read_text(encoding='utf-8-sig').splitlines():
@@ -42,8 +44,10 @@ removed=[line for line in rewrites if ' url reject' in line and line.split(' url
 rewrites=[line for line in rewrites if line not in removed]
 # Keep response script declarations before remaining static rewrites.
 rewrites.sort(key=lambda line:0 if ' url script-' in line else 1)
-(out/'AdBlock-Merged-Rewrite.conf').write_text('# NAME: AdBlock-Merged-Rewrite\n# Sources: AdBlock-Splash.conf, AdBlock-Script-a.conf\n'+f'# TOTAL: {len(rewrites)}\n\n'+'\n'.join(rewrites)+'\nhostname = '+','.join(dict.fromkeys(hosts))+'\n',encoding='utf-8')
+(out/'AdBlock-Merged-Rewrite.conf').write_text(f'# NAME: AdBlock-Merged-Rewrite\n# UPDATED: {updated_at}\n# Sources: AdBlock-Splash.conf, AdBlock-Script-a.conf\n'+f'# TOTAL: {len(rewrites)}\n\n'+'\n'.join(rewrites)+'\nhostname = '+','.join(dict.fromkeys(hosts))+'\n',encoding='utf-8')
 (out/'README.md').write_text('''# 合并规则
+
+两个订阅文件中的 `# UPDATED` 表示最近一次重建时间（UTC+8）。每日同步会刷新此时间，即使规则正文没有变化。
 
 - AdBlock-Merged-Filter.list：合并 Splash-Killer.list、BlockHttpDNS.list、AdBlock-Lite.list，按完整规则去重，保留原顺序和策略。
 - AdBlock-Merged-Rewrite.conf：合并 AdBlock-Splash.conf、AdBlock-Script-a.conf，合并 hostname；完全相同 URL 正则的拒绝规则让位于脚本，脚本声明放在前面。
