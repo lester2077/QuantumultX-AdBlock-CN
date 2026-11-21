@@ -1,5 +1,7 @@
 # 合并规则
 
+两个订阅文件中的 `# UPDATED` 表示最近一次重建时间（UTC+8）。每日同步会刷新此时间，即使规则正文没有变化。
+
 - AdBlock-Merged-Filter.list：合并 Splash-Killer.list、BlockHttpDNS.list、AdBlock-Lite.list，按完整规则去重，保留原顺序和策略。
 - AdBlock-Merged-Rewrite.conf：合并 AdBlock-Splash.conf、AdBlock-Script-a.conf，合并 hostname；完全相同 URL 正则的拒绝规则让位于脚本，脚本声明放在前面。
 
