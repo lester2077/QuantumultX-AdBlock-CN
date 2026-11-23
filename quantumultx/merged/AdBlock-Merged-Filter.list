@@ -1,7 +1,7 @@
 # NAME: AdBlock-Merged-Filter
-# UPDATED: 2026-11-22 09:24:44 (UTC+8)
+# UPDATED: 2026-11-23 09:48:59 (UTC+8)
 # Sources: Splash-Killer.list, BlockHttpDNS.list, AdBlock-Lite.list
-# TOTAL: 22922
+# TOTAL: 22921
 
 HOST-SUFFIX,24x7adservice.com,REJECT
 HOST-SUFFIX,2m3gdt0gc.de,REJECT
@@ -210,6 +210,7 @@ HOST-SUFFIX,kde.qq.com,REJECT
 HOST-SUFFIX,kuaishouzt.com,REJECT
 HOST-SUFFIX,leiki-doubleclick-proxy.appspot.com,REJECT
 HOST-SUFFIX,lf-static.tiktokpangle-cdn-us.com,REJECT
+HOST-SUFFIX,liveandhadapickup.org,REJECT
 HOST-SUFFIX,load.sst.lasadapippen.com,REJECT
 HOST-SUFFIX,log-hl.snssdk.com,REJECT
 HOST-SUFFIX,log-sdk.gifshow.com,REJECT
@@ -1272,7 +1273,6 @@ HOST-SUFFIX,accmgr.com,REJECT
 HOST-SUFFIX,accscdn.m.taobao.com,REJECT
 HOST-SUFFIX,acecounter.com,REJECT
 HOST-SUFFIX,acexedge.com,REJECT
-HOST-SUFFIX,acgbase.com,REJECT
 HOST-SUFFIX,acgbenzi.com,REJECT
 HOST-SUFFIX,achicih.gitee.io,REJECT
 HOST-SUFFIX,acidpigs.com,REJECT
@@ -14373,7 +14373,6 @@ HOST,accmgr.com,REJECT
 HOST,accscdn.m.taobao.com,REJECT
 HOST,acecounter.com,REJECT
 HOST,acexedge.com,REJECT
-HOST,acgbase.com,REJECT
 HOST,acgbenzi.com,REJECT
 HOST,achicih.gitee.io,REJECT
 HOST,acidpigs.com,REJECT
